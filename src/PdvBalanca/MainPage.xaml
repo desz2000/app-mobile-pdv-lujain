@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PdvBalanca.MainPage"
+             Title="Balança — PDV Lujain"
+             BackgroundColor="#f5f7fb">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Configurações" Clicked="OnConfiguracoesClicked" />
+    </ContentPage.ToolbarItems>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <!-- Card 1: precisa configurar URL -->
+            <Border x:Name="CardConfigurar"
+                    IsVisible="false"
+                    Stroke="#e2e8f0"
+                    StrokeShape="RoundRectangle 12"
+                    BackgroundColor="White"
+                    Padding="20">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Bem-vindo!" FontSize="22" FontAttributes="Bold" />
+                    <Label Text="Antes de usar, configure o endereço da API do PDV (computador do caixa)."
+                           TextColor="#475569" />
+                    <Button Text="Abrir configurações" Clicked="OnConfiguracoesClicked" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Card 2: precisa logar -->
+            <Border x:Name="CardLogin"
+                    IsVisible="false"
+                    Stroke="#e2e8f0"
+                    StrokeShape="RoundRectangle 12"
+                    BackgroundColor="White"
+                    Padding="20">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Entrar" FontSize="22" FontAttributes="Bold" />
+                    <Label Text="Digite o PIN para começar a lançar pratos."
+                           TextColor="#475569" />
+                    <Entry x:Name="PinEntry"
+                           Placeholder="PIN"
+                           IsPassword="True"
+                           Keyboard="Numeric"
+                           MaxLength="8"
+                           FontSize="20" />
+                    <Button Text="Entrar" Clicked="OnEntrarClicked" />
+                    <Label x:Name="LoginErro"
+                           TextColor="#dc2626"
+                           IsVisible="false"
+                           FontSize="14" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Card 3: lancamento de preco -->
+            <Border x:Name="CardBalanca"
+                    IsVisible="false"
+                    Stroke="#e2e8f0"
+                    StrokeShape="RoundRectangle 12"
+                    BackgroundColor="White"
+                    Padding="20">
+                <VerticalStackLayout Spacing="14">
+                    <Label Text="Adicionar prato à comanda" FontSize="22" FontAttributes="Bold" />
+
+                    <Label Text="Número da comanda" TextColor="#475569" />
+                    <Entry x:Name="ComandaEntry"
+                           Placeholder="Ex: 12"
+                           Keyboard="Numeric"
+                           FontSize="28"
+                           HorizontalTextAlignment="Center" />
+
+                    <Label Text="Valor exibido na balança (R$)" TextColor="#475569" />
+                    <Entry x:Name="ValorEntry"
+                           Placeholder="Ex: 35,50"
+                           Keyboard="Numeric"
+                           FontSize="28"
+                           HorizontalTextAlignment="Center" />
+
+                    <Button x:Name="AdicionarBtn"
+                            Text="Adicionar à comanda"
+                            BackgroundColor="#0d6efd"
+                            TextColor="White"
+                            HeightRequest="60"
+                            FontSize="18"
+                            Clicked="OnAdicionarClicked" />
+
+                    <Label x:Name="StatusLabel"
+                           IsVisible="false"
+                           FontSize="14"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Card 4: ultimos lancamentos -->
+            <Border x:Name="CardUltimos"
+                    IsVisible="false"
+                    Stroke="#e2e8f0"
+                    StrokeShape="RoundRectangle 12"
+                    BackgroundColor="White"
+                    Padding="20">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Últimos lançamentos" FontSize="18" FontAttributes="Bold" />
+                    <CollectionView x:Name="UltimosView" SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="0,6" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                                    <Label Grid.Column="0" Text="{Binding Hora}" TextColor="#475569" />
+                                    <Label Grid.Column="1" Text="{Binding ComandaTexto}" FontAttributes="Bold" />
+                                    <Label Grid.Column="2" Text="{Binding ValorTexto}" TextColor="#0d6efd" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
