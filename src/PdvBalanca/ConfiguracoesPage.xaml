@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PdvBalanca.ConfiguracoesPage"
+             Title="Configurações"
+             BackgroundColor="#f5f7fb">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <Border Stroke="#e2e8f0"
+                    StrokeShape="RoundRectangle 12"
+                    BackgroundColor="White"
+                    Padding="20">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Endereço da API" FontSize="20" FontAttributes="Bold" />
+                    <Label Text="URL do computador do caixa, ex: http://192.168.0.10:5170"
+                           TextColor="#475569" />
+                    <Entry x:Name="ApiUrlEntry"
+                           Placeholder="http://192.168.0.10:5170"
+                           Keyboard="Url" />
+                    <Button x:Name="TestarBtn"
+                            Text="Testar conexão"
+                            Clicked="OnTestarClicked" />
+                    <Label x:Name="TestarStatus" IsVisible="false" FontSize="14" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Stroke="#e2e8f0"
+                    StrokeShape="RoundRectangle 12"
+                    BackgroundColor="White"
+                    Padding="20">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Sessão" FontSize="20" FontAttributes="Bold" />
+                    <Label Text="Sai do PIN para forçar login na próxima abertura."
+                           TextColor="#475569" />
+                    <Button Text="Sair (limpar PIN salvo)" Clicked="OnSairClicked" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Button Text="Salvar e voltar"
+                    BackgroundColor="#0d6efd"
+                    TextColor="White"
+                    HeightRequest="50"
+                    Clicked="OnSalvarClicked" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

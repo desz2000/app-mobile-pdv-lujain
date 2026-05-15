@@ -1,0 +1,19 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/
+*.swp
+
+# Build output
+out/
+publish/
+
+# APK artefatos locais (gerados em /artifacts ou pelo build remoto)
+artifacts/
+
+# Logs
+*.log
+logs/
