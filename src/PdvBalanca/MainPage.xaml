@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:PdvBalanca"
              x:Class="PdvBalanca.MainPage"
              Title="Balança — PDV Lujain"
              BackgroundColor="#f5f7fb">
@@ -52,15 +53,15 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Card 3: lancamento de preco -->
-            <Border x:Name="CardBalanca"
+            <!-- Card 3: lançamento por cardápio -->
+            <Border x:Name="CardCardapio"
                     IsVisible="false"
                     Stroke="#e2e8f0"
                     StrokeShape="RoundRectangle 12"
                     BackgroundColor="White"
                     Padding="20">
                 <VerticalStackLayout Spacing="14">
-                    <Label Text="Adicionar prato à comanda" FontSize="22" FontAttributes="Bold" />
+                    <Label Text="Lançar na comanda" FontSize="22" FontAttributes="Bold" />
 
                     <Label Text="Número da comanda" TextColor="#475569" />
                     <Entry x:Name="ComandaEntry"
@@ -69,23 +70,91 @@
                            FontSize="28"
                            HorizontalTextAlignment="Center" />
 
-                    <Label Text="Valor exibido na balança (R$)" TextColor="#475569" />
-                    <Entry x:Name="ValorEntry"
-                           Placeholder="Ex: 35,50"
-                           Keyboard="Numeric"
-                           FontSize="28"
+                    <BoxView HeightRequest="1" Color="#e2e8f0" />
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Label Grid.Column="0"
+                               Text="Cardápio"
+                               FontAttributes="Bold"
+                               FontSize="16"
+                               VerticalOptions="Center" />
+                        <Button Grid.Column="1"
+                                x:Name="AtualizarCardapioBtn"
+                                Text="↻"
+                                FontSize="18"
+                                WidthRequest="48"
+                                HeightRequest="40"
+                                Padding="0"
+                                BackgroundColor="Transparent"
+                                TextColor="#0d6efd"
+                                BorderColor="#0d6efd"
+                                BorderWidth="1"
+                                Clicked="OnAtualizarCardapioClicked" />
+                    </Grid>
+
+                    <ActivityIndicator x:Name="CarregandoIndicator"
+                                       IsRunning="False"
+                                       IsVisible="False"
+                                       Color="#0d6efd"
+                                       HeightRequest="40" />
+
+                    <Label x:Name="CardapioVazioLabel"
+                           IsVisible="False"
+                           Text="Nenhum produto cadastrado. Adicione produtos no caixa (front web)."
+                           TextColor="#475569"
                            HorizontalTextAlignment="Center" />
 
-                    <Button x:Name="AdicionarBtn"
-                            Text="Adicionar à comanda"
-                            BackgroundColor="#0d6efd"
-                            TextColor="White"
-                            HeightRequest="60"
-                            FontSize="18"
-                            Clicked="OnAdicionarClicked" />
+                    <Label x:Name="CardapioErroLabel"
+                           IsVisible="False"
+                           TextColor="#dc2626"
+                           FontSize="14"
+                           HorizontalTextAlignment="Center" />
+
+                    <CollectionView x:Name="ProdutosView" SelectionMode="None">
+                        <CollectionView.ItemsLayout>
+                            <GridItemsLayout Orientation="Vertical"
+                                             Span="2"
+                                             HorizontalItemSpacing="10"
+                                             VerticalItemSpacing="10" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="local:ProdutoVm">
+                                <Border Stroke="{Binding CorBorda}"
+                                        StrokeShape="RoundRectangle 12"
+                                        BackgroundColor="{Binding CorFundo}"
+                                        Padding="12"
+                                        StrokeThickness="2"
+                                        MinimumHeightRequest="92">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnProdutoTapped" />
+                                    </Border.GestureRecognizers>
+                                    <VerticalStackLayout Spacing="4">
+                                        <Label Text="{Binding Nome}"
+                                               FontAttributes="Bold"
+                                               FontSize="15"
+                                               LineBreakMode="WordWrap"
+                                               TextColor="#0f172a" />
+                                        <Label Text="{Binding LinhaPreco}"
+                                               TextColor="{Binding CorBorda}"
+                                               FontSize="14"
+                                               FontAttributes="Bold" />
+                                        <Label Text="{Binding TextoAcao}"
+                                               TextColor="#64748b"
+                                               FontSize="11" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Button Text="+ Item avulso (fora do cardápio)"
+                            BackgroundColor="#e2e8f0"
+                            TextColor="#0f172a"
+                            HeightRequest="50"
+                            Clicked="OnAvulsoClicked" />
 
                     <Label x:Name="StatusLabel"
-                           IsVisible="false"
+                           IsVisible="False"
                            FontSize="14"
                            HorizontalTextAlignment="Center" />
                 </VerticalStackLayout>
@@ -103,9 +172,9 @@
                     <CollectionView x:Name="UltimosView" SelectionMode="None">
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
-                                <Grid Padding="0,6" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                                <Grid Padding="0,6" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                                     <Label Grid.Column="0" Text="{Binding Hora}" TextColor="#475569" />
-                                    <Label Grid.Column="1" Text="{Binding ComandaTexto}" FontAttributes="Bold" />
+                                    <Label Grid.Column="1" Text="{Binding LinhaPrincipal}" FontAttributes="Bold" />
                                     <Label Grid.Column="2" Text="{Binding ValorTexto}" TextColor="#0d6efd" />
                                 </Grid>
                             </DataTemplate>
