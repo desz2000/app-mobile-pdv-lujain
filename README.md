@@ -4,14 +4,26 @@ App Android para o operador da balança lançar pratos nas comandas do PDV Lujai
 
 Faz parte do sistema [`desz2000/app-pdv-lujain`](https://github.com/desz2000/app-pdv-lujain) — este repositório contém **só** o app mobile. A API e o front do caixa estão no repo principal.
 
+## Download do APK
+
+> **Última versão:** [v1.0.0 — Cardápio em botões](https://github.com/desz2000/app-mobile-pdv-lujain/releases/latest) — baixe `pdv-balanca-v1.0.0.apk` na seção **Assets**.
+
+O APK é assinado com a chave de debug do Android, pronto pra sideload. Não requer Play Store.
+
+A página de [Releases](https://github.com/desz2000/app-mobile-pdv-lujain/releases) mantém o histórico de versões — sempre que sair uma versão nova, ela aparece lá com changelog.
+
 ## Fluxo
 
 1. Cliente passa na balança e o operador vê o preço no visor.
-2. Operador abre o app, digita o **número da comanda** do cliente e o **valor exibido**.
-3. Toca em **Adicionar à comanda**. O app chama `POST /api/comandas/{numero}/itens` na API do PDV com `origem=Balanca`.
+2. Operador digita o **número da comanda** do cliente no topo da tela e **toca no produto** correspondente:
+   - **Cardápio em botões**: produtos cadastrados no caixa aparecem como cartões coloridos.
+     - **Verde** (preço fixo, ex.: Coca-Cola) — toque adiciona 1 unidade direto.
+     - **Laranja** (por kilo, ex.: prato) — toque abre prompt do valor exibido na balança.
+   - **+ Item avulso**: pra qualquer coisa fora do cardápio (pede descrição + valor).
+3. O app chama `POST /api/comandas/{numero}/itens` na API do PDV com `origem=Balanca`.
 4. O caixa, ao buscar a comanda no PC, já vê o item lançado.
 
-Se a comanda ainda não existe no sistema, a API cria automaticamente.
+Se a comanda ainda não existe no sistema, a API cria automaticamente. Se a comanda anterior com aquele número já estava fechada, uma nova é criada (cartões físicos reutilizáveis).
 
 ## Stack
 
@@ -20,14 +32,14 @@ Se a comanda ainda não existe no sistema, a API cria automaticamente.
 
 ## Como o operador instala
 
-1. Baixar o APK do **Release** do GitHub (o CI publica como artifact em todo PR e push) ou pedir pra quem fez a build mandar o `.apk` por outro meio.
+1. Baixar o APK da [última Release](https://github.com/desz2000/app-mobile-pdv-lujain/releases/latest) na seção **Assets**.
 2. No celular Android: **Configurações → Segurança → Instalar apps de fontes desconhecidas** (autoriza só a fonte que vai abrir o APK).
 3. Abrir o APK e instalar.
 4. Na primeira execução, **Configurações** → digitar `http://IP-DO-PC-DO-CAIXA:5170` (ex.: `http://192.168.0.10:5170`) → tocar em **Testar conexão** → **Salvar e voltar**.
 5. Digitar o PIN (configurado em `appsettings.json` da API).
-6. Pronto: a tela principal mostra os campos de número de comanda e valor.
+6. Pronto: a tela principal mostra o cardápio em botões para lançamento rápido.
 
-> Importante: o celular e o PC do caixa precisam estar na **mesma rede Wi‑Fi**.
+> Importante: o celular e o PC do caixa precisam estar na **mesma rede Wi‑Fi**, e a API precisa estar bindada em `0.0.0.0:5170` (o `start.cmd` do PDV já faz isso). O Firewall do Windows precisa liberar a porta TCP 5170 pra rede privada.
 
 ## Como rodar localmente (dev)
 
@@ -69,4 +81,29 @@ src/PdvBalanca/
 Exige a API do PDV principal rodando (porta 5170 por padrão):
 
 - `POST /api/auth/validar-pin` — valida o PIN digitado no app
-- `POST /api/comandas/{numero}/itens` — adiciona item à comanda (cria a comanda automaticamente se não existir), com cabeçalho `X-Pin: {pin}` e payload `{"descricao":"Prato kilo","valor":35.5,"origem":0}` (origem `0` = Balança)
+- `GET /api/produtos` — carrega o cardápio (cartões da tela principal)
+- `POST /api/comandas/{numero}/itens` — adiciona item à comanda (cria a comanda automaticamente se não existir), com cabeçalho `X-Pin: {pin}` e payload:
+  - **Preço fixo**: `{"produtoId":1,"quantidade":1,"origem":0}` (API usa `produto.Preço × quantidade`)
+  - **Por kilo**: `{"produtoId":2,"quantidade":1,"valor":35.5,"origem":0}` (operador informa o valor)
+  - **Avulso**: `{"descricao":"Sobremesa","valor":12.0,"quantidade":1,"origem":0}`
+
+## Lançar uma nova versão
+
+Quando quiser publicar um APK novo:
+
+```bash
+# 1. Build do APK assinado (chave de debug)
+dotnet publish src/PdvBalanca/PdvBalanca.csproj -c Release -f net8.0-android -p:AndroidPackageFormat=apk
+
+# 2. Renomear pra um nome amigável
+cp src/PdvBalanca/bin/Release/net8.0-android/publish/br.com.lujain.pdv.balanca-Signed.apk \
+   pdv-balanca-vX.Y.Z.apk
+
+# 3. Criar a Release no GitHub com o APK como asset
+gh release create vX.Y.Z \
+  --repo desz2000/app-mobile-pdv-lujain \
+  --target main \
+  --title "vX.Y.Z — <titulo>" \
+  --notes "<kenchangelog>" \
+  pdv-balanca-vX.Y.Z.apk
+```
