@@ -104,6 +104,6 @@ gh release create vX.Y.Z \
   --repo desz2000/app-mobile-pdv-lujain \
   --target main \
   --title "vX.Y.Z — <titulo>" \
-  --notes "<kenchangelog>" \
+  --notes "<changelog>" \
   pdv-balanca-vX.Y.Z.apk
 ```
